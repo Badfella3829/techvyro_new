@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login — TechVyro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+  <style>
+    :root{
+      --blue: #3b82f6;
+      --bg-dark: #020617;
+      --text-main: #e5e7eb;
+      --text-muted: #9aa0b4;
+      --error: #ef4444;
+      --success: #10b981;
+    }
+    *{box-sizing:border-box; margin:0; padding:0; font-family: 'Inter', system-ui, sans-serif; -webkit-tap-highlight-color: transparent;}
+    
+    body{
+      background: var(--bg-dark); color: var(--text-main); min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      overflow-x: hidden; position: relative; perspective: 1000px;
+      padding: 20px;
+    }
+
+    /* --- BACK HOME GLOW --- */
+    .back-home {
+      position: absolute; top: 30px; left: 30px; color: var(--text-muted);
+      text-decoration: none; font-size: 14px; font-weight: 600;
+      display: flex; align-items: center; gap: 8px; transition: 0.3s ease; z-index: 10;
+    }
+    /* Laptop Hover Glow */
+    @media (hover: hover) {
+      .back-home:hover { 
+        color: #fff; 
+        transform: translateX(-5px); 
+        text-shadow: 0 0 15px var(--blue), 0 0 30px var(--blue); 
+      }
+    }
+    /* Mobile Touch Glow */
+    .back-home:active { color: #fff; text-shadow: 0 0 15px var(--blue); }
+
+    .hero-glow {
+      position: absolute; top: -50%; left: 50%; transform: translateX(-50%);
+      width: 100%; height: 100%; z-index: -2; pointer-events: none;
+      background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%);
+    }
+
+    .grid-pattern {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100vh; z-index: -1; pointer-events: none;
+      background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 50px 50px; mask-image: linear-gradient(to bottom, black 20%, transparent 100%);
+    }
+
+    /* --- RESPONSIVE 3D CARD --- */
+    .login-card {
+      background: rgba(20, 26, 46, 0.65); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 40px; border-radius: 24px; width: 100%; max-width: 420px; position: relative;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.5); transform-style: preserve-3d; transition: transform 0.1s ease; animation: floatUp 0.8s ease forwards;
+    }
+
+    @keyframes floatUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+    .brand-header { text-align: center; margin-bottom: 30px; }
+    .brand-name { font-size: 32px; font-weight: 900; letter-spacing: -1px; text-decoration: none; display: block; margin-bottom: 5px; }
+    .brand-tech { color: #fff; }
+    .brand-vyro { color: var(--blue); }
+
+    .input-group { margin-bottom: 20px; text-align: left; }
+    .input-label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600; color: #cbd5e1; }
+    
+    .input-field {
+      width: 100%; background: rgba(2, 6, 23, 0.6); border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #fff; padding: 14px 16px; border-radius: 12px; font-size: 16px; transition: 0.3s;
+    }
+    .input-field:focus { border-color: var(--blue); outline: none; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15); }
+
+    .btn-primary {
+      width: 100%; padding: 14px; background: var(--blue); color: #020617; font-weight: 800;
+      font-size: 16px; border: none; border-radius: 12px; cursor: pointer; transition: 0.3s;
+    }
+    @media (hover: hover) {
+      .btn-primary:hover { transform: translateY(-2px); background: #60a5fa; box-shadow: 0 10px 20px rgba(59,130,246,0.3); }
+    }
+
+    /* --- LINK HOVER GLOW --- */
+    .form-footer { margin-top: 25px; text-align: center; font-size: 14px; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+    
+    .link { color: var(--blue); text-decoration: none; font-weight: 600; cursor: pointer; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+
+    @media (hover: hover) {
+      .link:hover { color: #fff; text-shadow: 0 0 15px var(--blue), 0 0 30px var(--blue); transform: translateY(-1px); }
+    }
+    .link:active { color: #fff; text-shadow: 0 0 15px var(--blue); }
+
+    .toast { margin-top: 15px; padding: 12px; border-radius: 8px; font-size: 13px; font-weight: 600; text-align: center; display: none; }
+    .toast.error { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.2); }
+    .toast.success { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.2); }
+    
+    #resetFormContainer { display: none; }
+
+    /* Mobile Tweaks */
+    @media (max-width: 480px) {
+      .login-card { padding: 30px 20px; }
+      .back-home { top: 20px; left: 20px; }
+    }
+  </style>
+<script type="module" src="./js/auth-guard.js"></script>
+</head>
+<body>
+
+  <div class="hero-glow"></div>
+  <div class="grid-pattern"></div>
+  <a href="index.html" class="back-home">← Back to Home
+</a>
+
+  <div class="login-card" id="card">
+    <div class="login-content">
+      <div id="loginContainer">
+        <div class="brand-header">
+          <a href="index.html" class="brand-name"><span class="brand-tech">Tech</span><span class="brand-vyro">Vyro</span></a>
+          <p style="color:var(--text-muted); font-size:15px;">Welcome back! Access your dashboard.</p>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Email Address</label>
+          <input type="email" id="username" class="input-field" placeholder="name@example.com">
+        </div>
+        <div class="input-group">
+          <label class="input-label">Password</label>
+          <input type="password" id="password" class="input-field" placeholder="••••••••">
+        </div>
+        <button id="loginBtn" class="btn-primary">Login</button>
+        <div class="form-footer">
+          <span class="link" id="forgotLink" style="color:#9aa0b4; font-weight:400">Forgot password?</span>
+          <span>New? <a href="signup.html" class="link">Create account</a></span>
+        </div>
+      </div>
+
+      <div id="resetFormContainer">
+        <div class="brand-header">
+          <h2 style="font-size:24px; font-weight:800; color:#fff; margin-bottom:8px;">Reset Password</h2>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Your Email</label>
+          <input type="email" id="resetEmail" class="input-field" placeholder="name@example.com">
+        </div>
+        <button id="resetBtn" class="btn-primary">Send Reset Link</button>
+        <button id="backToLogin" class="btn-primary" style="background:rgba(255,255,255,0.05); color:#fff; margin-top:10px;">Back to Login</button>
+      </div>
+      <div id="toast" class="toast"></div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { auth } from '../js/firebase.js';
+    import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+    const loginBtn = document.getElementById("loginBtn");
+    const toast = document.getElementById("toast");
+
+    const showToast = (msg, type) => {
+      toast.className = `toast ${type}`;
+      toast.innerText = msg;
+      toast.style.display = "block";
+      setTimeout(() => { toast.style.display = "none"; }, 4000);
+    };
+
+    document.getElementById("forgotLink").onclick = () => {
+      document.getElementById("loginContainer").style.display = 'none';
+      document.getElementById("resetFormContainer").style.display = 'block';
+    };
+    document.getElementById("backToLogin").onclick = () => {
+      document.getElementById("resetFormContainer").style.display = 'none';
+      document.getElementById("loginContainer").style.display = 'block';
+    };
+
+    loginBtn.onclick = async () => {
+      const u = document.getElementById("username").value.trim();
+      const p = document.getElementById("password").value;
+      if(!u || !p) return showToast("Enter credentials", "error");
+      loginBtn.innerText = 'Verifying...'; loginBtn.disabled = true;
+      try {
+        await signInWithEmailAndPassword(auth, u, p);
+        showToast("Login Success!", "success");
+        setTimeout(() => { window.location.href = "dashboard.html"; }, 1000);
+      } catch (err) {
+        showToast("Invalid Credentials", "error");
+        loginBtn.innerText = 'Login'; loginBtn.disabled = false;
+      }
+    };
+
+    // --- 3D TILT ONLY FOR LAPTOP ---
+    const card = document.getElementById('card');
+    if (window.innerWidth > 1024) {
+      card.onmousemove = (e) => {
+        const rect = card.getBoundingClientRect();
+        card.style.transform = `perspective(1000px) rotateX(${((e.clientY - rect.top - rect.height/2) / (rect.height/2)) * -8}deg) rotateY(${((e.clientX - rect.left - rect.width/2) / (rect.width/2)) * 8}deg) scale(1.02)`;
+      };
+      card.onmouseleave = () => card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
+    }
+  </script>
+</body>
+</html>

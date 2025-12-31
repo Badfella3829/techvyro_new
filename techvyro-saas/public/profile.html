@@ -137,7 +137,8 @@
     .badge.admin { background:#c7d2fe; color:#1e3a8a; }
     /* ================= END ADD ================= */
   </style>
-<script type="module" src="./js/auth-guard.js"></script>
+
+```html  <script type="module" src="./js/auth-guard.js"></script>
 </head>
 
 <body>
@@ -244,7 +245,8 @@
 
   const logoutBtn = document.getElementById("logoutBtn");
   if (logoutBtn) {
-    logoutBtn.onclick = async () => {
+    logoutbtn.addEventListener('click', async (e) => {
+  e.preventDefault();
       await signOut(auth);
       localStorage.removeItem("user"); // 🔥 added safe cleanup
       location.href = "login.html";

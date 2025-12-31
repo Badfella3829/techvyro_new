@@ -23,13 +23,11 @@
       padding: 20px;
     }
 
-    /* --- BACK HOME GLOW --- */
     .back-home {
       position: absolute; top: 30px; left: 30px; color: var(--text-muted);
       text-decoration: none; font-size: 14px; font-weight: 600;
       display: flex; align-items: center; gap: 8px; transition: 0.3s ease; z-index: 10;
     }
-    /* Laptop Hover Glow */
     @media (hover: hover) {
       .back-home:hover { 
         color: #fff; 
@@ -37,7 +35,6 @@
         text-shadow: 0 0 15px var(--blue), 0 0 30px var(--blue); 
       }
     }
-    /* Mobile Touch Glow */
     .back-home:active { color: #fff; text-shadow: 0 0 15px var(--blue); }
 
     .hero-glow {
@@ -52,7 +49,6 @@
       background-size: 50px 50px; mask-image: linear-gradient(to bottom, black 20%, transparent 100%);
     }
 
-    /* --- RESPONSIVE 3D CARD --- */
     .login-card {
       background: rgba(20, 26, 46, 0.65); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08);
       padding: 40px; border-radius: 24px; width: 100%; max-width: 420px; position: relative;
@@ -83,15 +79,8 @@
       .btn-primary:hover { transform: translateY(-2px); background: #60a5fa; box-shadow: 0 10px 20px rgba(59,130,246,0.3); }
     }
 
-    /* --- LINK HOVER GLOW --- */
     .form-footer { margin-top: 25px; text-align: center; font-size: 14px; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-    
     .link { color: var(--blue); text-decoration: none; font-weight: 600; cursor: pointer; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-
-    @media (hover: hover) {
-      .link:hover { color: #fff; text-shadow: 0 0 15px var(--blue), 0 0 30px var(--blue); transform: translateY(-1px); }
-    }
-    .link:active { color: #fff; text-shadow: 0 0 15px var(--blue); }
 
     .toast { margin-top: 15px; padding: 12px; border-radius: 8px; font-size: 13px; font-weight: 600; text-align: center; display: none; }
     .toast.error { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.2); }
@@ -99,20 +88,18 @@
     
     #resetFormContainer { display: none; }
 
-    /* Mobile Tweaks */
     @media (max-width: 480px) {
       .login-card { padding: 30px 20px; }
       .back-home { top: 20px; left: 20px; }
     }
   </style>
-
+<script type="module" src="./js/auth-guard.js"></script>
 </head>
 <body>
 
   <div class="hero-glow"></div>
   <div class="grid-pattern"></div>
-  <a href="index.html" class="back-home">← Back to Home
-</a>
+  <a href="index.html" class="back-home">← Back to Home</a>
 
   <div class="login-card" id="card">
     <div class="login-content">
@@ -152,7 +139,7 @@
   </div>
 
   <script type="module">
-    import { auth } from '../js/firebase.js';
+    import { auth } from './js/firebase.js';
     import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
     const loginBtn = document.getElementById("loginBtn");
@@ -174,22 +161,44 @@
       document.getElementById("loginContainer").style.display = 'block';
     };
 
-    loginBtn.onclick = async () => {
+    // FIXED: Event listener corrected with preventDefault
+    loginBtn.addEventListener('click', async (e) => {
+  e.preventDefault();e) => {
+      e.preventDefault();
       const u = document.getElementById("username").value.trim();
       const p = document.getElementById("password").value;
+
       if(!u || !p) return showToast("Enter credentials", "error");
-      loginBtn.innerText = 'Verifying...'; loginBtn.disabled = true;
+      
+      loginBtn.innerText = 'Verifying...'; 
+      loginBtn.disabled = true;
+
       try {
         await signInWithEmailAndPassword(auth, u, p);
         showToast("Login Success!", "success");
         setTimeout(() => { window.location.href = "dashboard.html"; }, 1000);
       } catch (err) {
+        console.error(err);
         showToast("Invalid Credentials", "error");
-        loginBtn.innerText = 'Login'; loginBtn.disabled = false;
+        loginBtn.innerText = 'Login'; 
+        loginBtn.disabled = false;
       }
+    });
+
+    const resetBtn = document.getElementById("resetBtn");
+    resetbtn.addEventListener('click', async (e) => {
+  e.preventDefault();
+        const email = document.getElementById("resetEmail").value.trim();
+        if(!email) return showToast("Enter your email", "error");
+        try {
+            await sendPasswordResetEmail(auth, email);
+            showToast("Reset link sent to email!", "success");
+        } catch (err) {
+            showToast("Error sending reset link", "error");
+        }
     };
 
-    // --- 3D TILT ONLY FOR LAPTOP ---
+    // 3D TILT
     const card = document.getElementById('card');
     if (window.innerWidth > 1024) {
       card.onmousemove = (e) => {

@@ -56,7 +56,8 @@ onAuthStateChanged(auth, async (user) => {
 
   // SAVE HANDLER
   document.querySelectorAll(".save").forEach(btn => {
-    btn.onclick = async () => {
+    btn.addEventListener('click', async (e) => {
+  e.preventDefault();
       const uid = btn.dataset.uid;
       const plan = document.querySelector(`.plan[data-uid="${uid}"]`).value;
       const credits = Number(document.querySelector(`.credits[data-uid="${uid}"]`).value);
@@ -68,7 +69,8 @@ onAuthStateChanged(auth, async (user) => {
 
   // BLOCK / UNBLOCK
   document.querySelectorAll(".block").forEach(btn => {
-    btn.onclick = async () => {
+    btn.addEventListener('click', async (e) => {
+  e.preventDefault();
       const uid = btn.dataset.uid;
       const isBlock = btn.innerText === "Block";
       await updateDoc(doc(db, "users", uid), { blocked: isBlock });
